@@ -1,0 +1,264 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>Theme Template for Bootstrap</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap theme -->
+    <link href="/css/bootstrap-theme.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="/css/theme.css" rel="stylesheet">
+<script src="/jquery/dist/jquery.min.js"></script>
+    <script>
+        $(function () {
+
+            document.forms.candidate.addEventListener('submit', function (event) {
+                event.preventDefault();
+                var self = event.target;
+                console.log(this.lname.value);
+                $.post('/candidates', {
+                    firstname: this.fname.value,
+                    lastname: this.lname.value,
+                    email: this.email.value
+                }, function (data) {
+                    console.log(data);
+                    self.reset();
+                });
+
+
+            });
+
+            $.get('/candidates', function (data) {
+                console.log(data);
+                var tbody = document.getElementById('tbody');
+                data.forEach(function (elem) {
+                    var tr = document.createElement('tr');
+                    var td = document.createElement('td');
+
+                    td.innerHTML = elem.firstname;
+                    tr.id = elem._id;
+                    tr.appendChild(td);
+                    td = document.createElement('td');
+                    td.innerHTML = elem.lastname;
+
+                    tr.appendChild(td);
+                    td = document.createElement('td');
+                    td.innerHTML = elem.email;
+
+                    tr.appendChild(td);
+                    tbody.appendChild(tr);
+                    var button = document.createElement('button');
+                    button.type = "button";
+                    button.className = "btn btn-default btn-xs btnedit";
+                    button.setAttribute("data-toggle", "modal");
+                    button.setAttribute("data-target", "#myModal");
+                    var span = document.createElement('span');
+                    button.addEventListener('click', function (event) {
+
+                        $.get('/candidates/' + elem._id, function (data) {
+                            console.log(data);
+
+                            var fName=document.getElementById('fnameedit');
+                            var lName=document.getElementById('lnameedit');
+                            var inpId=document.getElementById('idvalue');
+                            var inpEmail=document.getElementById('inpemailedit');
+                             fName.value=data[0].firstname;
+                             lName.value=data[0].lastname;
+                             inpEmail.value=data[0].email;
+                             inpId.value=data[0]._id;
+
+
+                        });
+                    });
+                        span.className = "glyphicon glyphicon-pencil";
+                        button.appendChild(span);
+                        tr.appendChild(button);
+                        button = document.createElement('button');
+                        button.type = "button";
+                        button.className = "btn btn-default btn-xs";
+                        span = document.createElement('span');
+                        span.className = "glyphicon glyphicon-trash";
+                        button.appendChild(span);
+                        tr.appendChild(button);
+
+
+
+
+                });
+
+            });
+
+
+            var editData = document.getElementById('save');
+            editData.addEventListener('click', function (event) {
+             var idValue = document.getElementById('idvalue');
+             updateData(event, idValue.value);
+             });
+
+
+
+              function updateData(event, inpid) {
+                   event.preventDefault();
+                   var xhr = new XMLHttpRequest();
+                   var self = event.target;
+                   xhr.open('PUT', '/candidates/' + inpid);
+                   xhr.setRequestHeader('Content-type', 'application/json');
+                   var fName = document.getElementById('fnameedit');
+                   console.log(fName.value);
+                   var lName = document.getElementById('lnameedit');
+                   var inpEmail = document.getElementById('inpemailedit');
+
+                   var obj = {
+                       fname: fName.value,
+                       lname: lName.value,
+                       email: inpEmail.value,
+                       id: inpid
+                   };
+                   console.log(obj);
+                   xhr.send(JSON.stringify(obj));
+                   fName.value = '';
+                   lName.value = '';
+                   inpEmail.value = '';
+               }
+
+
+        });
+
+
+
+    </script>
+
+</head>
+
+<body role="document">
+
+
+
+<div class="container theme-showcase" role="main">
+
+
+
+
+
+<div class="page-header">
+    <h1>Candidates Portfolio</h1>
+</div>
+
+<p>
+    <a href="#create"><button type="button" class="btn btn-primary">Create new Candidate</button></a>
+    <a href="#view"><button type="button" class="btn btn-info">View All Candidates</button></a>
+
+</p>
+
+
+<div class="page-header" id="create">
+    <h1>Create Candidate</h1>
+</div>
+    <form class="form-horizontal" role="form" method="post" name="candidate">
+        <div class="form-group">
+            <label for="inputFirstName3" class="col-sm-2 control-label">First Name</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="inputFirstName3" placeholder="First Name" name="fname">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputLastName3" class="col-sm-2 control-label">Last Name</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="inputLastName3" placeholder="Last Name" name="lname">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputEmail3" class="col-sm-2 control-label">Email</label>
+            <div class="col-sm-10">
+                <input type="email" class="form-control" id="inputEmail3" placeholder="Email" name="email">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-default">Submit</button>
+            </div>
+        </div>
+    </form>
+
+
+
+<div class="page-header" id="view">
+    <h1>Tables</h1>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Username</th>
+            </tr>
+            </thead>
+            <tbody id="tbody">
+
+
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+
+    <!-- Modal Update Data-->
+   <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Update Data</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group">
+                        <span class="input-group-addon">First Name : </span>
+                        <input type="text" class="form-control" placeholder="first name ..." id="fnameedit">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">Last Name : </span>
+                        <input type="text" class="form-control" placeholder="last name ..." id="lnameedit">
+                    </div>
+                    <br/>
+                    <input type="hidden" id="idvalue"/>
+                    <div class="input-group">
+                        <span class="input-group-addon">Email : </span>
+                        <input type="text" class="form-control" placeholder="Candidate Email ... " id="inpemailedit">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="save">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    </div>
+
+
+
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/docs.min.js"></script>
+</body>
+</html>

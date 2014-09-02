@@ -1,0 +1,10 @@
+{
+    "name": "angular",
+    "version": "1.2.21",
+    "main": "./angular.js",
+    "dependencies": {
+        "angular":"latest",
+        "angular-route":"latest",
+        "jquery":"latest"
+    }
+}
